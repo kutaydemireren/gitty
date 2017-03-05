@@ -1,0 +1,111 @@
+#!/bin/bash
+CASES=( "ruby" "objective-c" "python" "swift" "c" "c++" "cuda" "java" )
+RESULTS=( "Ruby" "Objective-C" "Python" "Swift" "C" "C++" "CUDA" "Java" )
+
+function find_and_download {
+    func_arg=$1
+
+    total=${#CASES[*]}
+    downloaded=0
+    for (( i=0; i <= $(( $total -1 )); i++ ))
+    do
+	if [ "$func_arg" == "${CASES[$i]}" ]
+	then
+	    echo_installing ${CASES[$i]}
+	    download ${RESULTS[$1]}
+	    downloaded=1
+	    break
+	fi
+    done    
+
+    if [ $downloaded == 0 ]
+    then
+	echo "No such file."
+	echo "Either not added to CASES-RESULTS or mistyped. Please check both."
+    fi
+}
+
+function echo_installing {
+    echo "Installing $1 .gitignore..."
+    echo $1 > .gitty
+}
+
+function download {
+    curl -o .gitignore https://raw.githubusercontent.com/github/gitignore/master/$1.gitignore
+}
+
+function remove_all {
+    echo "Removing gitty related files..."
+    if [ -f ./.gitty ]
+    then
+	rm .gitty
+	echo "  Removed gitty"
+    else
+	echo "  No gitty file found"
+    fi
+
+    if [ -f ./.gitignore ]
+    then
+	rm .gitignore
+	echo "  Removed gitignore"    
+    else
+	echo "  No gitignore file found"
+    fi
+}
+
+function main {
+    # script start here
+    if [ $# == 0 ]
+    then
+	no_arg_given_error
+    elif [ $1 == "update" ]
+    then
+	if [ -f ./.gitignore ] 
+	then
+	    echo "Found .gitignore! Will be updated soon..."
+	# test download, will be changed later.
+	# find_and_download ruby
+	    if [ -f ./.gitty ]
+	    then
+		echo "Found .gitty! Updating..."
+	    # read the first line
+		installed=$(head -n 1 ./.gitty)
+		find_and_download $installed
+	    else
+	    	echo "No .gitty file is found." 
+		echo "Please be sure to have .gitty in your current working directory."
+		echo "Or you can add .gitty manually to work around, if it is deleted somehow."
+	    fi
+	else
+	    echo "No .gitignore file is found." 
+	    echo "Please be sure with the path of the current working directory."
+	fi
+    elif [ $1 == "info" ]
+    then
+	info
+    elif [ $1 == "remove" ]
+    then
+	remove_all
+    else
+	find_and_download $1
+    fi
+}
+
+function no_arg_given_error {
+    echo " No argument given."
+    echo " Please select one of the following: "
+    echo "   * update to update by re-downloading your .gitignore file"
+    echo "   * info to see what and how gitty works"
+}
+ 
+function info {
+    echo "Usage as the following:"
+    echo "*** Start with typing gitty, then select whichever you want to create ***"
+    echo "*** Avaliable options, initially, are:"
+    for i in "${CASES[@]}"
+    do
+	echo "*** * $i"
+    done
+}
+
+main $1
