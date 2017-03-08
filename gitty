@@ -9,10 +9,11 @@ function find_and_download {
     downloaded=0
     for (( i=0; i <= $(( $total -1 )); i++ ))
     do
+	
 	if [ "$func_arg" == "${CASES[$i]}" ]
 	then
 	    echo_installing ${CASES[$i]}
-	    download ${RESULTS[$1]}
+	    download ${RESULTS[$i]}
 	    downloaded=1
 	    break
 	fi
